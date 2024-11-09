@@ -1,0 +1,63 @@
+-- Q1  Retrieve the names of all tracks that have more than 1 billion streams.
+SELECT stream, track
+FROM public.spotify
+WHERE stream > 1000000000;
+
+-- Q2 List all albums along with their respective artists.
+SELECT DISTINCT album, artist 
+FROM public.spotify
+ORDER BY 1;
+
+-- Q3 Get the total number of comments for tracks where licensed = TRUE.
+SELECT SUM(comments)
+FROM public.spotify
+WHERE licensed = 'true';
+
+-- Q4 Find all tracks that belong to the album type single.
+SELECT *
+FROM public.spotify
+WHERE album_type = 'single';
+
+-- Q5 Count the total number of tracks by each artist.
+SELECT COUNT(track), artist
+FROM public.spotify
+GROUP BY artist;
+
+-- Q6 Calculate the average danceability of tracks in each album.
+SELECT album, AVG(danceability)
+FROM public.spotify
+GROUP BY album
+ORDER BY 2 DESC;
+
+-- Q7 Find the top 5 tracks with the highest energy values.
+SELECT track, MAX(energy)
+FROM public.spotify
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 5;
+
+-- Q8 List all tracks along with their total views and total likes where official_video = TRUE.
+SELECT track, 
+SUM(views) AS total_views, 
+SUM(likes) AS total_likes
+FROM public.spotify
+WHERE official_video = 'true'
+GROUP BY 1
+ORDER BY 2 DESC;
+
+-- Q9 For each album, calculate the total views of all associated tracks.
+SELECT album,track,
+SUM(views) AS total_views
+FROM public.spotify
+GROUP BY 1, 2
+ORDER BY 3 DESC;
+
+-- Q10 Retrieve the track names that have been streamed on Spotify more than YouTube.
+SELECT * FROM
+(SELECT track,
+COALESCE(SUM(CASE WHEN most_played_on = 'Youtube' THEN stream END),0) AS Youtube,
+COALESCE(SUM(CASE WHEN most_played_on = 'Spotify' THEN stream END),0) AS Spotify
+FROM public.spotify
+GROUP BY 1 
+) AS T1
+WHERE Spotify > Youtube AND Youtube <> 0
